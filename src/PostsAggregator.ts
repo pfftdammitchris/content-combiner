@@ -50,13 +50,13 @@ class PostsAggregator<DataObject extends {} = any> {
       this.getTargetKeys()?.reduce((acc, key) => {
         // Mapped directly by property translation
         if (typeof keymap[key] === 'string') {
-          acc[key] = (item) => _.get(item, keymap[key])
+          acc[key] = (item: DataObject) => get(item, keymap[key])
         } else if (typeof keymap[key] === 'function') {
           // Function mapper
           acc[key] = keymap[key]
         } else {
           // Default mapper (string)
-          acc[key] = (item) => _.get(item, item[key])
+          acc[key] = (item: DataObject) => get(item, item[key])
         }
         return acc
       }, {}) || {}

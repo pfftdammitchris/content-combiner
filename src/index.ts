@@ -1,5 +1,1 @@
-console.log("hello");
-
-export interface Hello {
-  f: string;
-}
+export { default } from './PostsAggregator'
