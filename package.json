@@ -1,5 +1,5 @@
 {
-  "name": "posts-aggregator",
+  "name": "@jsm/posts-aggregator",
   "version": "0.0.1",
   "main": "dist/posts-aggregator.cjs.js",
   "module": "dist/posts-aggregator.esm.js",
