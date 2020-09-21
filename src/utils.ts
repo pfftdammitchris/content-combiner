@@ -1,11 +1,25 @@
 export function get<T>(obj: T, path: string) {
-  let result = obj
-  const parts = path.split('.')
-  const numParts = parts.length
+  if (typeof path !== 'string') return undefined
 
-  for (let index = 0; index < numParts; index++) {
-    result = result[index]
-    if (!result) return result
-    if (typeof result === 'object') continue
+  let result = obj
+
+  if (isObject(result)) {
+    const parts = path.split('.')
+    const numParts = parts.length
+
+    for (let index = 0; index < numParts; index++) {
+      const key = parts[index]
+      result = result[key]
+
+      if (!isObject(result) || index + 1 >= numParts) {
+        break
+      }
+    }
+
+    return result
   }
+}
+
+export function isObject(value: unknown): value is object {
+  return !!value && typeof value === 'object'
 }

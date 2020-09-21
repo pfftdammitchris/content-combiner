@@ -5,7 +5,7 @@ class PostsAggregator<DataObject extends {} = any> {
   #targetKeys: string[] | undefined
   fetchers: T.Fetcher<DataObject>[]
 
-  constructor({ fetchers = [] }: { fetchers: T.Fetcher<DataObject>[] }) {
+  constructor({ fetchers = [] }: { fetchers?: T.Fetcher<DataObject>[] } = {}) {
     this.fetchers = fetchers
   }
 
@@ -18,10 +18,20 @@ class PostsAggregator<DataObject extends {} = any> {
   // TODO: Transducer
   createFetcher(
     fetch: T.Fetcher,
-    { keymap = {} }: { keymap?: T.Keymap<DataObject> },
+    { keymap = {} }: { keymap?: T.Keymap<DataObject> } = {},
   ) {
-    const fetcher = async (...args: any[]): Promise<DataObject[]> => {
+    if (typeof fetch !== 'function') {
+      throw new Error(
+        'The fetch function provided as the first argument is not a function',
+      )
+    }
+
+    const fetcher = async (
+      ...args: any[]
+    ): Promise<DataObject[] | undefined> => {
       const results = await fetch(...args)
+      if (!results) return
+
       const reducer = (acc: DataObject[], item: any) => {
         if (item) {
           const result = {} as DataObject
@@ -45,9 +55,13 @@ class PostsAggregator<DataObject extends {} = any> {
     return fetcher
   }
 
+  /**
+   * Formats the keymap for the executor
+   * @param { Keymap } keymap
+   */
   createMappedKeys<Keymap extends T.Keymap<DataObject>>(keymap: Keymap) {
     return (
-      this.getTargetKeys()?.reduce((acc, key) => {
+      this.getTargetKeys().reduce((acc, key) => {
         // Mapped directly by property translation
         if (typeof keymap[key] === 'string') {
           acc[key] = (item: DataObject) => get(item, keymap[key])
