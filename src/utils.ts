@@ -1,23 +1,22 @@
-export function get<T>(obj: T, path: string) {
-  if (typeof path !== 'string') return undefined
+export function get<T>(obj: T, path: string | string[]) {
+  if (typeof path !== 'string' && !Array.isArray(path)) {
+    return undefined
+  }
 
   let result = obj
+  const parts = Array.isArray(path) ? path.slice() : path.split('.')
+  const totalParts = parts.length
 
   if (isObject(result)) {
-    const parts = path.split('.')
-    const numParts = parts.length
-
-    for (let index = 0; index < numParts; index++) {
+    for (let index = 0; index < totalParts; index++) {
       const key = parts[index]
-      result = result[key]
-
-      if (!isObject(result) || index + 1 >= numParts) {
-        break
+      if (typeof key === 'string') {
+        result = result && result[key]
       }
     }
-
-    return result
   }
+
+  return result
 }
 
 export function isObject(value: unknown): value is object {

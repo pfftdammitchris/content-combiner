@@ -25,15 +25,12 @@ it('should use the target keys to create the mapped keys', () => {
     description: 'what do you want?',
     age: 14,
     chips: 'no remarks',
-    forensics: 'is useful'
+    forensics: 'is useful',
   }
   const targetKeys = ['pistachios', 'chips']
   const keymap = {
-    pistachios: 
+    // pistachios:
   }
   aggregator.setTargetKeys(targetKeys)
   aggregator.createMappedKeys({})
 })
-
-
-

@@ -31,7 +31,8 @@
     "build:js": "rm -rf dist && rollup -c",
     "build:types": "tsc --declaration --emitDeclarationOnly --declarationDir dist/types",
     "start": "rollup -c -w",
-    "test": "ts-mocha -r ts-node/register --extensions ts --watch --watch-files src src/**/*.test.ts"
+    "test": "ts-mocha -r ts-node/register --extensions ts --watch --watch-files src src/**/*.test.ts",
+    "test:file": "ts-mocha -r ts-node/register --extensions ts --watch --watch-files src -- "
   },
   "files": [
     "dist"
