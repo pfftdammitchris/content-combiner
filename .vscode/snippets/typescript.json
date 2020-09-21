@@ -1,0 +1,10 @@
+{
+  "test": {
+    "prefix": "test",
+    "body": "import { expect } from 'chai'"
+  },
+  "sinon": {
+    "prefix": "sinon",
+    "body": "import sinon from 'sinon'"
+  }
+}
