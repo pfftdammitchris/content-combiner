@@ -31,7 +31,6 @@ class PostsAggregator<DataObject extends {} = any> {
     ): Promise<DataObject[] | undefined> => {
       const results = await fetch(...args)
       if (!results) return
-
       const reducer = (acc: DataObject[], item: any) => {
         if (item) {
           const result = {} as DataObject
