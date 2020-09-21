@@ -1,4 +1,6 @@
 import typescript from '@rollup/plugin-typescript'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 import pkg from './package.json'
 
 export default {
@@ -28,5 +30,5 @@ export default {
     //   exports: 'default',
     // },
   ],
-  plugins: [typescript()],
+  plugins: [commonjs(), resolve(), typescript()],
 }
