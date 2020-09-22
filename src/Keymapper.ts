@@ -22,13 +22,9 @@ class Keymapper<DataObject extends {} = any> {
     const mapper = this.getMapper(key as keyof DataObject)
 
     if (typeof mapper === 'string' || Array.isArray(mapper)) {
-      if (arguments.length <= 1) {
-        throw new Error(
-          `The mapper for key "${key}" is a string or array. You must provide a dataObject as a second argument`,
-        )
-      }
-      result = get(dataObject, mapper)
-    } else if (typeof key === 'object') {
+      result = get(obj, mapper)
+    } else if (typeof mapper === 'function') {
+      // result =
       const objKeys = Object.keys(key)
       result = objKeys.reduce((acc, k) => {
         acc[k] = key[this.keymap[k] || k]
