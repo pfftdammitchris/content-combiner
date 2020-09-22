@@ -1,10 +1,10 @@
 import { expect } from 'chai'
-import Translator from '../Translator'
+import Keymapper from '../Keymapper'
 
-let translator: Translator
+let translator: Keymapper
 
 beforeEach(() => {
-  translator = new Translator()
+  translator = new Keymapper()
 })
 
 const dataObject = {

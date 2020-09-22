@@ -3,11 +3,10 @@ export type Fetcher<DataObject = any> = (
 ) => Promise<DataObject[]>
 
 export type Keymap<DataObject> = Partial<
-  Record<keyof DataObject, Keymapper<DataObject>>
+  Record<keyof DataObject, Mapper<DataObject>>
 >
 
-// Value of a target key
-export type Keymapper<DataObject> =
+export type Mapper<DataObject extends {} = any> =
   | string
   | string[]
   | ((obj: DataObject) => any)
