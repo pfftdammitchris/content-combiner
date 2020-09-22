@@ -18,20 +18,26 @@ const dataObject = {
   },
 }
 
-it('should set the key mapper', () => {
-  const keymapper = 'fruita.oppo.fruit'
-  translator.setKeymapper('fruit', keymapper)
-  expect(translator.getKeymapper('fruit')).to.equal(keymapper)
+it('should set the mapper', () => {
+  const mapper = 'fruita.oppo.fruit'
+  translator.setMapper('fruit', mapper)
+  expect(translator.getMapper('fruit')).to.equal(mapper)
 })
 
 it('should return the mapped value for string mappers', () => {
-  translator.setKeymapper('fruit', 'fruita.oppo.fruit')
+  translator.setMapper('fruit', 'fruita.oppo.fruit')
   const result = translator.get('fruit', dataObject)
   expect(result).to.equal('the path to fruit')
 })
 
 it('should return the mapped value for stringed array mappers', () => {
-  translator.setKeymapper('fruit', ['fruita', 'oppo', 'fruit'])
+  translator.setMapper('fruit', ['fruita', 'oppo', 'fruit'])
+  const result = translator.get('fruit', dataObject)
+  expect(result).to.equal('the path to fruit')
+})
+
+it('should return the mapped value for func mappers', () => {
+  translator.setMapper('fruit', (item) => item.fruita.oppo.fruit)
   const result = translator.get('fruit', dataObject)
   expect(result).to.equal('the path to fruit')
 })

@@ -13,7 +13,7 @@ class Keymapper<DataObject extends {} = any> {
     return this.keymap[key]
   }
 
-  get(key: keyof DataObject, obj?: DataObject) {
+  get<D extends DataObject>(key: keyof DataObject, obj?: D) {
     if (arguments.length < 2) {
       throw new Error('Missing key or data object')
     }
@@ -21,15 +21,12 @@ class Keymapper<DataObject extends {} = any> {
     let result: any
     const mapper = this.getMapper(key as keyof DataObject)
 
-    if (typeof mapper === 'string' || Array.isArray(mapper)) {
-      result = get(obj, mapper)
-    } else if (typeof mapper === 'function') {
-      // result =
-      const objKeys = Object.keys(key)
-      result = objKeys.reduce((acc, k) => {
-        acc[k] = key[this.keymap[k] || k]
-        return acc
-      }, {})
+    if (obj) {
+      if (typeof mapper === 'string' || Array.isArray(mapper)) {
+        result = get(obj, mapper)
+      } else if (typeof mapper === 'function') {
+        result = mapper(obj)
+      }
     }
 
     return result
