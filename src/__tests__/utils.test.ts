@@ -1,6 +1,18 @@
 import { expect } from 'chai'
 import { getMockDataObject } from './test-utils'
-import { get } from '../utils'
+import {
+  assign,
+  compose,
+  entries,
+  get,
+  isArr,
+  isFnc,
+  isObj,
+  isStr,
+  map,
+  spread,
+} from '../utils'
+import { Mapper } from 'types'
 
 describe('get', () => {
   let obj: { [key: string]: any }
@@ -74,32 +86,19 @@ describe('transducing', () => {
   }
 
   it('', () => {
-    const bananaMapper = (mapper: Function) => (acc: any, item: any) => {
-      acc['banana'] = mapper(item)
-      return acc
+    function createKeymapAccumulator(key: string, mapper: Mapper) {
+      return (acc: any, item: any) =>
+        isStr(mapper) || isArr(mapper)
+          ? assign(acc, { [key]: get(item, mapper) })
+          : isFnc(mapper)
+          ? assign(acc, { [key]: mapper(item) })
+          : acc
     }
-    const userAgeMapper = (mapper: Function) => (acc: any, item: any) =>
-      _.get(item, keymap.userAge)
-    const userEmailMapper = (mapper: Function) => (acc: any, item: any) =>
-      _.get(item, keymap.userEmail)
-    const userFirstNameMapper = (mapper: Function) => (acc: any, item: any) =>
-      _.get(item, keymap.userFirstName)
-    const userLastNameMapper = (mapper: Function) => (acc: any, item: any) =>
-      _.get(item, keymap.userLastName)
 
-    const step = (fn: Function) => (acc: any, val: any) => fn(val) ? _.assign(acc)
+    const transducer = compose(
+      ...map(entries(keymap), spread(createKeymapAccumulator)),
+    )((acc: any, reducer: Function) => reducer(acc))
 
-    const xform = _.flowRight(
-      bananaMapper,
-      userAgeMapper,
-      userEmailMapper,
-      userFirstNameMapper,
-      userLastNameMapper,
-      (reducer: Function) => keymap.twitter,
-      (reducer: Function) => keymap.facebook,
-      (reducer: Function) => keymap.testings,
-    )(step)
-
-    const transducer = _.reduce()
+    console.log(transducer(dataObject))
   })
 })
