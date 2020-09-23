@@ -8,29 +8,31 @@ beforeEach(() => {
   aggregator = new PostsAggregator()
 })
 
-it('should call the fetchers when executing', async () => {
-  const spy = sinon.spy()
-  aggregator.createFetcher(spy)
-  await aggregator.execute()
-  expect(spy.called).to.be.true
-})
+describe('PostsAggregator', () => {
+  it('should call the fetchers when executing', async () => {
+    const spy = sinon.spy()
+    aggregator.createFetcher(spy)
+    await aggregator.execute()
+    expect(spy.called).to.be.true
+  })
 
-it.skip('should return undefined when undefined was the result of the fetch call', () => {
-  //
-})
+  it.skip('should return undefined when undefined was the result of the fetch call', () => {
+    //
+  })
 
-it('should use the target keys to create the mapped keys', () => {
-  const dataObject = {
-    title: 'this is my title. pistachios are good',
-    description: 'what do you want?',
-    age: 14,
-    chips: 'no remarks',
-    forensics: 'is useful',
-  }
-  const targetKeys = ['pistachios', 'chips']
-  const keymap = {
-    // pistachios:
-  }
-  aggregator.setTargetKeys(targetKeys)
-  aggregator.createMappedKeys({})
+  it('should use the target keys to create the mapped keys', () => {
+    const dataObject = {
+      title: 'this is my title. pistachios are good',
+      description: 'what do you want?',
+      age: 14,
+      chips: 'no remarks',
+      forensics: 'is useful',
+    }
+    const targetKeys = ['pistachios', 'chips']
+    const keymap = {
+      // pistachios:
+    }
+    aggregator.setTargetKeys(targetKeys)
+    aggregator.createMappedKeys({})
+  })
 })
