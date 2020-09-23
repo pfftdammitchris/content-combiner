@@ -74,18 +74,20 @@ describe('transducing', () => {
   }
 
   it('', () => {
-    const bananaMapper = (reducer: Function) => (item: any) =>
-      _.get(item, keymap.banana)
-    const userAgeMapper = (reducer: Function) => (item: any) =>
+    const bananaMapper = (mapper: Function) => (acc: any, item: any) => {
+      acc['banana'] = mapper(item)
+      return acc
+    }
+    const userAgeMapper = (mapper: Function) => (acc: any, item: any) =>
       _.get(item, keymap.userAge)
-    const userEmailMapper = (reducer: Function) => (item: any) =>
+    const userEmailMapper = (mapper: Function) => (acc: any, item: any) =>
       _.get(item, keymap.userEmail)
-    const userFirstNameMapper = (reducer: Function) => (item: any) =>
+    const userFirstNameMapper = (mapper: Function) => (acc: any, item: any) =>
       _.get(item, keymap.userFirstName)
-    const userLastNameMapper = (reducer: Function) => (item: any) =>
+    const userLastNameMapper = (mapper: Function) => (acc: any, item: any) =>
       _.get(item, keymap.userLastName)
 
-    const step = (acc: any, val: any) => _.assign(acc, val)
+    const step = (fn: Function) => (acc: any, val: any) => fn(val) ? _.assign(acc)
 
     const xform = _.flowRight(
       bananaMapper,
