@@ -1,56 +1,84 @@
 import get from 'lodash.get'
+import Keymapper from './Keymapper'
 import * as T from './types'
+import { entries, forEach, isArr, isFnc, isStr, keys, spread } from './utils'
 
 class PostsAggregator<DataObject extends {} = any> {
-  #targetKeys: string[] | undefined
-  fetchers: T.Fetcher<DataObject>[]
+  #keymapper = new Keymapper()
+  #fetchers: T.Fetcher<DataObject>[]
 
-  constructor({ fetchers = [] }: { fetchers?: T.Fetcher<DataObject>[] } = {}) {
-    this.fetchers = fetchers
+  constructor({
+    fetchers = [],
+    keymap = {},
+  }: { fetchers?: T.Fetcher<DataObject>[]; keymap?: T.Keymap<DataObject> } = {}) {
+    this.#fetchers = fetchers
+    this.#keymap = keymap
+  }
+
+  get keymap() {
+    return this.#keymapper.keymap
   }
 
   async execute<T = any>(options?: T) {
-    const promise = (f: T.Fetcher) => f(options)
-    const results = await Promise.all(this.fetchers.map(promise))
+    const results: any[][] = []
+    const numFetchers = this.#fetchers.length
+
+    for (let index = 0; index < numFetchers; index++) {
+      const fetch = this.#fetchers[index]
+      const result = await fetch(options)
+      results.push(
+        result.map((r) => {
+          const res = {}
+          forEach(entries(r), ([k, v]) => {
+            res[k] = this.#keymapper.get(k, v)
+          })
+          return res
+        }),
+      )
+    }
+
     return results
   }
 
-  // TODO: Transducer
-  createFetcher(
-    fetch: T.Fetcher,
-    { keymap = {} }: { keymap?: T.Keymap<DataObject> } = {},
-  ) {
-    if (typeof fetch !== 'function') {
+  createFetcher(fetch: T.Fetcher) {
+    if (!isFnc(fetch)) {
       throw new Error(
         'The fetch function provided as the first argument is not a function',
       )
     }
 
-    const fetcher = async (
-      ...args: any[]
-    ): Promise<DataObject[] | undefined> => {
+    const fetcher = async (...args: any[]): Promise<DataObject[]> => {
       const results = await fetch(...args)
-      if (!results) return
-      const reducer = (acc: DataObject[], item: any) => {
+      if (!results) return []
+
+      const targetKeys = keys(this.keymap)
+      const mappedKeys = this.getMappedKeys()
+
+      return results.reduce((acc: DataObject[], item: any) => {
         if (item) {
           const result = {} as DataObject
-          Object.entries(this.createMappedKeys(keymap)).forEach(
-            ([key, mapper]) => {
-              // TODO: This logic is supposed to be in createdMapperKeys
-              if (typeof mapper === 'string' || Array.isArray(mapper)) {
-                result[key] = get(item, mapper)
-              } else if (typeof mapper === 'function') {
-                result[key] = mapper(item)
+          forEach(
+            entries(mappedKeys),
+            spread((key: string, mapper: T.Mapper<DataObject>) => {
+              if (targetKeys.includes(key)) {
+                if (isStr(mapper) || isArr(mapper)) {
+                  result[key] = get(item, mapper)
+                } else if (isFnc(mapper)) {
+                  result[key] = mapper(item)
+                }
+              } else {
+                result[key] = item[key]
               }
-            },
+            }),
           )
           acc.push(result)
         }
         return acc
-      }
-      return results.reduce(reducer, [])
+      }, [])
     }
-    this.fetchers.push(fetcher)
+
+    this.#fetchers.push(fetcher)
+
     return fetcher
   }
 
@@ -58,31 +86,22 @@ class PostsAggregator<DataObject extends {} = any> {
    * Formats the keymap for the executor
    * @param { Keymap } keymap
    */
-  createMappedKeys<Keymap extends T.Keymap<DataObject>>(keymap: Keymap) {
+  getMappedKeys() {
     return (
-      this.getTargetKeys().reduce((acc, key) => {
-        // Mapped directly by property translation
-        if (typeof keymap[key] === 'string') {
-          acc[key] = (item: DataObject) => get(item, keymap[key])
-        } else if (typeof keymap[key] === 'function') {
+      keys(this.keymap).reduce((acc, key) => {
+        if (isStr(this.keymap[key])) {
+          // Mapped directly by property swapping
+          acc[key] = (item: DataObject) => get(item, this.keymap[key])
+        } else if (isFnc(this.keymap[key])) {
           // Function mapper
-          acc[key] = keymap[key]
+          acc[key] = this.keymap[key]
         } else {
           // Default mapper (string)
           acc[key] = (item: DataObject) => get(item, item[key])
         }
         return acc
-      }, {}) || {}
+      }, {} as T.FinalizedKeymap<any>) || ({} as T.FinalizedKeymap<any>)
     )
-  }
-
-  setTargetKeys(targetKeys: string[]) {
-    this.#targetKeys = targetKeys
-    return this
-  }
-
-  getTargetKeys() {
-    return this.#targetKeys || []
   }
 }
 

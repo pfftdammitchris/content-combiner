@@ -32,7 +32,5 @@ describe('PostsAggregator', () => {
     const keymap = {
       // pistachios:
     }
-    aggregator.setTargetKeys(targetKeys)
-    aggregator.createMappedKeys({})
   })
 })

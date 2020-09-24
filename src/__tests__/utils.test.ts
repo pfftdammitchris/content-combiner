@@ -46,7 +46,7 @@ describe('get', () => {
     expect(result).to.eq(4)
   })
 
-  const invalidGetPaths = ['food.fruits.gold.numGood', '', 2, 0, {}]
+  const invalidGetPaths = ['food.fruits.gold.numGood', 2, 0, {}]
 
   invalidGetPaths.forEach((val) => {
     it(`should be undefined when using ${JSON.stringify(
