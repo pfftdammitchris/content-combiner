@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { getMockDataObject } from './test-utils'
 import { get } from '../utils'
+import { FinalizedKeymap, Mapper } from 'types'
 
 describe('get', () => {
   let obj: { [key: string]: any }
@@ -72,12 +73,39 @@ describe('transducing', () => {
         testType: t.type,
       })),
   }
+  function getMappedValue(key, item, mapper) {
+    return { [key]: getMapper(mapper)?.(item) }
+  }
+  function getMapper(mapper: Mapper) {
+    if (typeof mapper === 'string' || Array.isArray(mapper)) {
+      return (item: any) => get(item, mapper)
+    } else if (typeof mapper === 'function') {
+      return mapper
+    }
+  }
+  const formattedKeymapper = Object.entries(keymap).reduce(
+    (acc: FinalizedKeymap<any>, [key, mapper]) => {
+      acc[key] = getMapper(mapper)
+      return acc
+    },
+    {},
+  )
+
+  function createTransducedKeymapper(
+    key: string,
+    mapper: string | string[] | ((item: any) => any),
+  ) {
+    return (step: (acc: any, item: any) => any) => {
+      return (acc: any, item: any) => {
+        return step(acc, getMapper())
+      }
+    }
+  }
 
   it('', () => {
-    const bananaMapper = (mapper: Function) => (acc: any, item: any) => {
-      acc['banana'] = mapper(item)
-      return acc
-    }
+    const bananaMapper = (mapper: Function) => (
+      step: (acc: any, item: any) => typeof acc,
+    ) => (acc: any, item: any) => step(acc, mapper(item))
     const userAgeMapper = (mapper: Function) => (acc: any, item: any) =>
       _.get(item, keymap.userAge)
     const userEmailMapper = (mapper: Function) => (acc: any, item: any) =>
@@ -87,7 +115,7 @@ describe('transducing', () => {
     const userLastNameMapper = (mapper: Function) => (acc: any, item: any) =>
       _.get(item, keymap.userLastName)
 
-    const step = (fn: Function) => (acc: any, val: any) => fn(val) ? _.assign(acc)
+    const step = (acc: any, val: any) => _.assign(acc, val)
 
     const xform = _.flowRight(
       bananaMapper,
