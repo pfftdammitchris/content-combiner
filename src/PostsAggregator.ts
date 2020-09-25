@@ -1,18 +1,26 @@
 import get from 'lodash.get'
 import Keymapper from './Keymapper'
 import * as T from './types'
-import { entries, forEach, isArr, isFnc, isStr, keys, spread } from './utils'
+import { assign, entries, forEach, isArr, isFnc, isStr, keys, map, spread } from './utils'
 
 class PostsAggregator<DataObject extends {} = any> {
   #keymapper = new Keymapper()
+  #keymap: T.Keymap<DataObject>
   #fetchers: T.Fetcher<DataObject>[]
 
   constructor({
     fetchers = [],
     keymap = {},
-  }: { fetchers?: T.Fetcher<DataObject>[]; keymap?: T.Keymap<DataObject> } = {}) {
+    keymapper,
+  }: {
+    fetchers?: T.Fetcher<DataObject>[]
+    keymap?: T.Keymap<DataObject>
+    keymapper?: Keymapper
+  } = {}) {
     this.#fetchers = fetchers
     this.#keymap = keymap
+    this.#keymapper =
+      keymapper && keymapper instanceof Keymapper ? keymapper : new Keymapper()
   }
 
   get keymap() {
@@ -40,25 +48,24 @@ class PostsAggregator<DataObject extends {} = any> {
     return results
   }
 
-  createFetcher(fetch: T.Fetcher) {
+  createFetcher(fetch: T.Fetcher, options: { keymappers?: T.Keymap<DataObject> } = {}) {
     if (!isFnc(fetch)) {
       throw new Error(
         'The fetch function provided as the first argument is not a function',
       )
     }
 
+    const { keymappers } = options
+
     const fetcher = async (...args: any[]): Promise<DataObject[]> => {
       const results = await fetch(...args)
       if (!results) return []
-
-      const targetKeys = keys(this.keymap)
-      const mappedKeys = this.getMappedKeys()
 
       return results.reduce((acc: DataObject[], item: any) => {
         if (item) {
           const result = {} as DataObject
           forEach(
-            entries(mappedKeys),
+            entries(keymappers),
             spread((key: string, mapper: T.Mapper<DataObject>) => {
               if (targetKeys.includes(key)) {
                 if (isStr(mapper) || isArr(mapper)) {
@@ -77,9 +84,37 @@ class PostsAggregator<DataObject extends {} = any> {
       }, [])
     }
 
+    fetcher.id = this.#createId()
+
     this.#fetchers.push(fetcher)
 
     return fetcher
+  }
+
+  #functifyKeymappers = (keymappers: T.Keymap<DataObject>) => {
+    const m = (fn) => (step) => (acc, item) => step(acc, fn(item))
+    const step = (acc, [key, mapper]) => (item) => assign(acc, { [key]: mapper(item) })
+    const x = (fn) => (acc, o) => assign(acc, fn(o))
+    const keyedMapper = entries(keymappers).reduce((acc, [key, mapper]) => {
+      if (isStr(mapper) || isArr(mapper)) {
+        // Mapped directly by property swapping
+        acc[key] = (item: DataObject) => get(item, mapper)
+      } else if (isFnc(mapper)) {
+        // Function mapper
+        acc[key] = this.keymap[key]
+      } else {
+        // Default mapper (string)
+        acc[key] = (item: DataObject) => get(item, item[key])
+      }
+      return acc
+    }, {})
+    const compose = (mappers: [string, T.FuncMapper<DataObject>][]) => (accumulate) =>
+      entries(mappers).reduce(
+        (acc, [key, mapper]) => accumulate(assign(acc, { [key]: mapper })),
+        (item) => accumulate(item),
+      )
+
+    const xform = compose()
   }
 
   /**
@@ -102,6 +137,10 @@ class PostsAggregator<DataObject extends {} = any> {
         return acc
       }, {} as T.FinalizedKeymap<any>) || ({} as T.FinalizedKeymap<any>)
     )
+  }
+
+  #createId = () => {
+    return `_${Math.random().toString(36).substr(2, 9)}`
   }
 }
 

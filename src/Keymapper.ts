@@ -5,25 +5,7 @@ class Keymapper<DataObject extends {} = any> {
   keymap: T.Keymap<DataObject> = {}
 
   /**
-   * Sets the mapper into the keymap by the key
-   * @param { string } key
-   */
-  setMapper(key: keyof DataObject, mapper: T.Mapper<DataObject>) {
-    this.keymap[key] = mapper
-    return this
-  }
-
-  /**
-   * Retrieves the mapper set on the keymap by using the key
-   * @param { string } key
-   */
-  getMapper(key: keyof DataObject) {
-    return this.keymap[key]
-  }
-
-  /**
-   * Uses the key to retrieve the mapper which will be used on the obj and
-   * returns the result evaluated from it
+   * Uses the key to retrieve the mapped value, which is used on the obj
    * @param { string } key
    */
   get<D extends DataObject>(key: keyof DataObject, obj?: D) {
@@ -45,6 +27,23 @@ class Keymapper<DataObject extends {} = any> {
     }
 
     return result
+  }
+
+  /**
+   * Sets the mapper into the keymap by the key
+   * @param { string } key
+   */
+  set(key: keyof DataObject, mapper: T.Mapper<DataObject>) {
+    this.keymap[key] = mapper
+    return this
+  }
+
+  /**
+   * Retrieves the mapper set on the keymap by using the key
+   * @param { string } key
+   */
+  getMapper(key: keyof DataObject) {
+    return this.keymap[key]
   }
 }
 
