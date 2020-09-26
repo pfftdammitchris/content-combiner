@@ -1,6 +1,6 @@
 {
   "name": "@jsmanifest/content-combiner",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "dist/content-combiner.cjs.js",
   "module": "dist/content-combiner.esm.js",
   "typings": "dist/types/index.d.ts",
