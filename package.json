@@ -1,5 +1,5 @@
 {
-  "name": "@jsm/posts-aggregator",
+  "name": "@jsm/content-combiner",
   "version": "1.0.0",
   "main": "dist/posts-aggregator.cjs.js",
   "module": "dist/posts-aggregator.esm.js",
@@ -43,5 +43,28 @@
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "all"
-  }
+  },
+  "description": "[![Greenkeeper badge](https://badges.greenkeeper.io/rollup/rollup-starter-lib.svg)](https://greenkeeper.io/)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfftdammitchris/posts-aggregator.git"
+  },
+  "keywords": [
+    "Combine",
+    "content",
+    "from",
+    "multiple",
+    "sources",
+    "into",
+    "one",
+    "unified",
+    "data",
+    "structure"
+  ],
+  "author": "pfftdammitchris",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pfftdammitchris/posts-aggregator/issues"
+  },
+  "homepage": "https://github.com/pfftdammitchris/posts-aggregator#readme"
 }
