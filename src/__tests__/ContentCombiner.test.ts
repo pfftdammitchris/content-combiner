@@ -2,7 +2,7 @@ import sinon from 'sinon'
 import { expect } from 'chai'
 import { entries, keys } from '../utils'
 import Keymapper from '../Keymapper'
-import PostsAggregator from '../PostsAggregator'
+import ContentCombiner from '../Combiner'
 
 const mockData = getMockData()
 
@@ -20,13 +20,13 @@ const dataKeys = [
   'lastUpdated',
 ]
 
-let aggregator: PostsAggregator<typeof mockData[0]>
+let aggregator: ContentCombiner<typeof mockData[0]>
 
 beforeEach(() => {
-  aggregator = new PostsAggregator()
+  aggregator = new ContentCombiner()
 })
 
-describe('PostsAggregator', () => {
+describe('ContentCombiner', () => {
   it('should call the fetchers when executing', async () => {
     const spy = sinon.spy()
     aggregator.createFetcher(spy, { keymappers: {} as any })
