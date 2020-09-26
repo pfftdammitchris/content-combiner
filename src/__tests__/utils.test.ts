@@ -1,18 +1,39 @@
 import { expect } from 'chai'
-import { getMockDataObject } from './test-utils'
-import {
-  assign,
-  compose,
-  entries,
-  get,
-  isArr,
-  isFnc,
-  isObj,
-  isStr,
-  map,
-  spread,
-} from '../utils'
-import { Mapper } from 'types'
+import { get } from '../utils'
+
+const mockDataObject = {
+  apples: {
+    numExpired: 2,
+    numGood: 5,
+  },
+  bananas: {
+    numExpired: 0,
+    numGood: 4,
+    tests: [
+      { type: 'virus', subject: 'apple', passed: false },
+      { type: 'bacteria', subject: 'microbes', passed: false },
+    ],
+  },
+  user: {
+    email: 'abc@gmail.com',
+    name: {
+      first: 'Bobbie',
+      last: 'Mendoza',
+    },
+    age: 24,
+    single: true,
+    socialMedia: {
+      twitter: {
+        username: 'myTwitterUsername',
+        url: 'https://twitter.com/myTwitterUsername',
+      },
+      facebook: {
+        username: 'ib.21x123',
+        url: 'https://facebook.com/ib.21x123',
+      },
+    },
+  },
+}
 
 describe('get', () => {
   let obj: { [key: string]: any }
@@ -49,56 +70,26 @@ describe('get', () => {
   const invalidGetPaths = ['food.fruits.gold.numGood', 2, 0, {}]
 
   invalidGetPaths.forEach((val) => {
-    it(`should be undefined when using ${JSON.stringify(
-      val,
-    )} as a path`, () => {
+    it(`should be undefined when using ${JSON.stringify(val)} as a path`, () => {
       expect(get(obj, val as any)).to.be.undefined
     })
   })
 })
 
-describe('transducing', () => {
-  const dataObject = getMockDataObject()
-  const targetKeys = [
-    'banana',
-    'userAge',
-    'userEmail',
-    'userFirstName',
-    'userLastName',
-    'twitter',
-    'facebook',
-    'testings',
-  ]
+describe.skip('transducing', () => {
   const keymap = {
     banana: 'bananas',
     userAge: 'user.age',
     userEmail: 'user.email',
     userFirstName: 'user.name.first',
     userLastName: 'user.name.last',
-    twitter: (item: typeof dataObject) => item.user.socialMedia.twitter,
-    facebook: (item: typeof dataObject) => item.user.socialMedia.facebook,
-    testings: (item: typeof dataObject) =>
+    twitter: (item: typeof mockDataObject) => item.user.socialMedia.twitter,
+    facebook: (item: typeof mockDataObject) => item.user.socialMedia.facebook,
+    testings: (item: typeof mockDataObject) =>
       item.bananas.tests.map((t) => ({
         title: t.subject,
         isPassed: t.passed,
         testType: t.type,
       })),
   }
-
-  it('', () => {
-    function createKeymapAccumulator(key: string, mapper: Mapper) {
-      return (acc: any, item: any) =>
-        isStr(mapper) || isArr(mapper)
-          ? assign(acc, { [key]: get(item, mapper) })
-          : isFnc(mapper)
-          ? assign(acc, { [key]: mapper(item) })
-          : acc
-    }
-
-    const transducer = compose(
-      ...map(entries(keymap), spread(createKeymapAccumulator)),
-    )((acc: any, reducer: Function) => reducer(acc))
-
-    console.log(transducer(dataObject))
-  })
 })

@@ -1,49 +1,46 @@
-import { get } from './utils'
+import { get, isStr, isArr, isFnc } from './utils'
 import * as T from './types'
 
 class Keymapper<DataObject extends {} = any> {
-  keymap: T.Keymap<DataObject> = {}
+  keymap: T.Keymap<DataObject> = new Map()
 
   /**
    * Uses the key to retrieve the mapped value, which is used on the obj
    * @param { string } key
    */
-  get<D extends DataObject>(key: keyof DataObject, obj?: D) {
+  parse<D extends DataObject>(mapper: T.Mapper<DataObject>, obj?: D) {
     if (arguments.length < 2) {
-      throw new Error('Missing key or data object')
+      throw new Error('Missing mapper or data object')
     }
 
     let result: any
-    const mapper = this.getMapper(key as keyof DataObject)
 
     if (obj) {
-      if (typeof mapper === 'string' || Array.isArray(mapper)) {
+      if (isStr(mapper) || isArr(mapper)) {
         result = get(obj, mapper)
-      } else if (typeof mapper === 'function') {
+      } else if (isFnc(mapper)) {
         result = mapper(obj)
       } else {
-        result = obj[key]
+        result = get(obj, isStr(mapper) ? mapper : String(mapper))
       }
+    } else {
+      throw new TypeError('Argument "obj" is null or undefined')
     }
 
     return result
+  }
+
+  get(key: string) {
+    return this.keymap.get(key)
   }
 
   /**
    * Sets the mapper into the keymap by the key
    * @param { string } key
    */
-  set(key: keyof DataObject, mapper: T.Mapper<DataObject>) {
-    this.keymap[key] = mapper
+  set(key: string, mapper: T.Mapper<DataObject>) {
+    this.keymap.set(key, mapper)
     return this
-  }
-
-  /**
-   * Retrieves the mapper set on the keymap by using the key
-   * @param { string } key
-   */
-  getMapper(key: keyof DataObject) {
-    return this.keymap[key]
   }
 }
 

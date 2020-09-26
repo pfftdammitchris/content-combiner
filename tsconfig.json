@@ -1,24 +1,22 @@
 {
-  "ts-node": {
-    "transpileOnly": true
-  },
   "compilerOptions": {
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
-    // "declaration": true,
-    // "declarationDir": "dist",
     "esModuleInterop": true,
     "lib": ["es5", "es6", "esnext"],
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    // "outDir": "dist",
+    "resolveJsonModule": true,
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "esnext"
   },
   "exclude": ["node_modules/**/*", "dist"],
-  "include": ["src/**/*", "rollup.config.js"]
+  "include": ["src/**/*", "rollup.config.js"],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }

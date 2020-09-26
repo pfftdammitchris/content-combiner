@@ -11,13 +11,13 @@ export default {
       file: pkg.main,
       format: 'cjs',
       sourcemap: 'inline-source-map',
-      exports: 'default',
+      exports: 'named',
     },
     {
       file: pkg.module,
       format: 'es',
       sourcemap: 'inline-source-map',
-      exports: 'default',
+      exports: 'named',
     },
     // {
     //   file: pkg.browser,
