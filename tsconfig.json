@@ -4,15 +4,15 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "esModuleInterop": true,
-    "lib": ["es5", "es6", "esnext"],
-    "module": "commonjs",
+    "lib": ["esnext"],
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "esnext"
+    "target": "es2015"
   },
   "exclude": ["node_modules/**/*", "dist"],
   "include": ["src/**/*", "rollup.config.js"],
