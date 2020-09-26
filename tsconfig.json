@@ -15,8 +15,5 @@
     "target": "es2015"
   },
   "exclude": ["node_modules/**/*", "dist"],
-  "include": ["src/**/*", "rollup.config.js"],
-  "ts-node": {
-    "transpileOnly": true
-  }
+  "include": ["src/**/*", "rollup.config.js"]
 }

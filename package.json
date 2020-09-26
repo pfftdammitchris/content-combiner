@@ -30,8 +30,9 @@
     "build:js": "rm -rf dist && rollup -c",
     "build:types": "tsc --declaration --emitDeclarationOnly --declarationDir dist/types",
     "start": "rollup -c -w",
-    "test": "ts-mocha -r ts-node/register --extensions ts --watch --watch-files src src/**/*.test.ts --file src/__tests__/setupTests.ts",
-    "test:file": "ts-mocha -r ts-node/register --extensions ts --watch --watch-files src --file src/__tests__/setupTests.ts -- "
+    "test": "ts-mocha -p tsconfig.tests.json -r ts-node/register --extensions ts src/**/*.test.ts --file src/__tests__/setupTests.ts",
+    "test:watch": "ts-mocha -p tsconfig.tests.json -r ts-node/register --extensions ts --watch --watch-files src src/**/*.test.ts --file src/__tests__/setupTests.ts",
+    "test:file": "ts-mocha -p tsconfig.tests.json -r ts-node/register --extensions ts --watch --watch-files src --file src/__tests__/setupTests.ts -- "
   },
   "files": [
     "dist"
