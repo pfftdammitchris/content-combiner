@@ -1,6 +1,6 @@
 {
-  "name": "@jsm/content-combiner",
-  "version": "1.0.0",
+  "name": "@jsmanifest/content-combiner",
+  "version": "1.0.1",
   "main": "dist/posts-aggregator.cjs.js",
   "module": "dist/posts-aggregator.esm.js",
   "browser": "dist/posts-aggregator.umd.js",
@@ -44,10 +44,9 @@
     "tabWidth": 2,
     "trailingComma": "all"
   },
-  "description": "[![Greenkeeper badge](https://badges.greenkeeper.io/rollup/rollup-starter-lib.svg)](https://greenkeeper.io/)",
+  "description": "Combine content from multiple sources into one unified data structure",
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pfftdammitchris/posts-aggregator.git"
+    "url": "https://github.com/pfftdammitchris/content-combiner.git"
   },
   "keywords": [
     "Combine",
