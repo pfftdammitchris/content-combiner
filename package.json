@@ -1,6 +1,6 @@
 {
   "name": "@jsm/posts-aggregator",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "dist/posts-aggregator.cjs.js",
   "module": "dist/posts-aggregator.esm.js",
   "browser": "dist/posts-aggregator.umd.js",
