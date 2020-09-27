@@ -49,8 +49,18 @@ const getSiblings = (type) => (item) => {
   if (item[type]) {
     return {
       [type]: item[type].map((fullName) => {
-        const [firstName, lastName] = fullName.split(' ')
-        return { firstName, lastName }
+        if (Array.isArray(fullName)) {
+          const [firstName, lastName] = fullName.split(' ')
+          return {
+            firstName,
+            lastName,
+          }
+        } else if (fullName && typeof fullName === 'object') {
+          return {
+            firstName: fullName.firstName,
+            lastName: fullName.lastName,
+          }
+        }
       }),
     }
   }
@@ -59,33 +69,29 @@ const getSiblings = (type) => (item) => {
 const getBrothers = getSiblings('brothers')
 const getSisters = getSiblings('sisters')
 
-const composeSi
-
-
-blingMappers = (...fns) => (item) =>
-  fns.reduce((acc, fn) => (acc ? Object.assign(acc, fn(item)) : fn(item) || acc))
-
-const keymappers = {
-  subtitle: 'description',
-  description: 'details',
-  updatedAt: 'modified',
-  siblings: (item) => ({
-    ...getSiblings,
-  }),
+const composeSiblingMappers = (...fns) => {
+  return (item) =>
+    fns.reduce(
+      (acc, fn) => (acc ? Object.assign(acc, fn(item)) : fn(item) || acc),
+      undefined,
+    )
 }
 
-combiner.createFetcher(
-  async ({ limit = 50 }) => {
-    const results = mockData
-
-    if (results.length > limit) {
-      return results.slice(0, limit)
-    }
-
-    return results
+// prettier-ignore
+combiner.createFetcher(() => Promise.resolve(mockData), {
+  keymappers: {
+    subtitle: 'description',
+    description: 'details',
+    updatedAt: 'modified',
+    siblings: composeSiblingMappers(
+      getBrothers,
+      getSibsters
+    ),
   },
-  {
-    keymappers: {},
-  },
-)
+})
+
+combiner
+  .execute()
+  .then((results) => console.log(results))
+  .catch(console.error)
 ```
