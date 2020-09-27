@@ -1,4 +1,6 @@
-# content-combiner
+# @jsmanifest/content-combiner
+
+Grab data from multiple sources by providing a fetcher and a keymapping that you provide for each source which will translate their data structures to a unified one that you define by using the **Keymapper** API from this library.
 
 ## Installation
 
@@ -95,3 +97,5 @@ combiner
   .then((results) => console.log(results))
   .catch(console.error)
 ```
+
+## Documentation

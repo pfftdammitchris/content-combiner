@@ -218,6 +218,15 @@ combiner.createFetcher(() => Promise.resolve(mockData2), {
   },
 })
 
+after(() => {
+  combiner
+    .execute()
+    .then((results) => {
+      console.log(results)
+    })
+    .catch(console.error)
+})
+
 function getMockData() {
   return [
     {
