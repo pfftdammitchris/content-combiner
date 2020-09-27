@@ -1,5 +1,5 @@
 import ContentCombiner from '../src'
-import { isStr } from '../src/utils'
+import { get } from '../src/utils'
 
 const mockData2 = [
   {
@@ -34,10 +34,10 @@ const mockData2 = [
 const combiner = new ContentCombiner()
 
 const getSiblings = (type) => (item) => {
-  if (item[type]) {
+  if (item && item[type]) {
     return {
       [type]: item[type].map((fullName) => {
-        if (isStr(fullName)) {
+        if (typeof fullName === 'string') {
           const [firstName, lastName] = fullName.split(' ')
           return {
             firstName,
@@ -59,7 +59,7 @@ const getSisters = getSiblings('sisters')
 
 const composeSiblingMappers = (...fns) => {
   return (item) =>
-    fns.reduce(
+    fns.reduceRight(
       (acc, fn) => (acc ? Object.assign(acc, fn(item)) : fn(item) || acc),
       undefined,
     )
@@ -71,16 +71,16 @@ combiner.createFetcher(() => Promise.resolve(mockData2), {
     subtitle: 'description',
     description: 'details',
     updatedAt: 'modified',
-    siblings: composeSiblingMappers(
+    siblings: (item) => composeSiblingMappers(
       getBrothers,
       getSisters
-    ),
+    )(get(item, 'relatives')),
   },
 })
 
 combiner
   .execute()
   .then((results) => {
-    console.log(results)
+    console.log(JSON.stringify(results, null, 2))
   })
   .catch(console.error)
