@@ -1,6 +1,6 @@
 import sinon from 'sinon'
 import { expect } from 'chai'
-import { entries, keys } from '../utils'
+import { entries, keys, isStr } from '../utils'
 import Keymapper from '../Keymapper'
 import ContentCombiner from '../Combiner'
 
@@ -169,15 +169,15 @@ const mockData2 = [
     published: '2020-09-26T14:00:55+00:00',
     relatives: null,
   },
-]
+] as const
 
 const combiner = new ContentCombiner()
 
-const getSiblings = (type) => (item) => {
+const getSiblings = (type: 'brothers' | 'sisters') => (item: any) => {
   if (item[type]) {
     return {
-      [type]: item[type].map((fullName) => {
-        if (Array.isArray(fullName)) {
+      [type]: item[type].map((fullName: string | { [key: string]: any }) => {
+        if (isStr(fullName)) {
           const [firstName, lastName] = fullName.split(' ')
           return {
             firstName,
@@ -197,8 +197,8 @@ const getSiblings = (type) => (item) => {
 const getBrothers = getSiblings('brothers')
 const getSisters = getSiblings('sisters')
 
-const composeSiblingMappers = (...fns) => {
-  return (item) =>
+const composeSiblingMappers = (...fns: any[]) => {
+  return (item: any) =>
     fns.reduce(
       (acc, fn) => (acc ? Object.assign(acc, fn(item)) : fn(item) || acc),
       undefined,
